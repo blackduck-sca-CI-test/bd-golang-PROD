@@ -10,7 +10,7 @@ pipeline {
         BD_TOKEN = credentials('BLACKDUCK_API_TOKEN') // must be 'Secret text'
     }
     triggers {
-        cron '50 20 * * 1,4' // Runs at 01:50 on every day-of-week from Monday through Friday.”
+        cron '50 20 * * 1,4' // Runs at 20:50 on Monday and Thursday
          }
     stages {
         stage('Download and Extract Bridge CLI') {
@@ -55,7 +55,7 @@ pipeline {
 
                     "${BRIDGE_CLI_DIR}/bridge-cli-bundle-linux64/bridge-cli" \
                         --stage blackducksca \
-                        blackducksca.url="https://blackduck.saas-qa.beescloud.com/" \
+                        blackducksca.url="https://blackduck.saas-preprod.beescloud.com/" \
                         blackducksca.scan.full=true \
                         blackducksca.token="${BD_TOKEN}" \
                         blackducksca_reports_sarif_create=true \
