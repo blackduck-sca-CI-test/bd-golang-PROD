@@ -3,15 +3,17 @@ pipeline {
 
     environment {
         BRIDGE_CLI_DIR = "${WORKSPACE}/bridge-cli"
-        DETECT_PROJECT_NAME = "qe-ninja-blackduck-project-prod"
+        DETECT_PROJECT_NAME = "qe-ninja-blackduck-project-qa"
         DETECT_VERSION_NAME = "1.0.0"
         GO_VERSION="1.21.2"
         BD_URL = credentials('BLACKDUCK_URL') // or use credentials if you really want
         BD_TOKEN = credentials('BLACKDUCK_API_TOKEN') // must be 'Secret text'
     }
+    
     triggers {
-        cron '50 20 * * 1,4' // Runs at 20:50 on Monday and Thursday
+        cron '15 03 * * 1-5' // Runs at 03:15 on every day-of-week from Monday through Friday
          }
+    
     stages {
         stage('Download and Extract Bridge CLI') {
             steps {
@@ -74,11 +76,21 @@ pipeline {
                 '''
             }
         }
-
-        stage('Archive SARIF Report') {
+        stage('Security Scan') {
             steps {
-                archiveArtifacts artifacts: 'output/*.sarif', fingerprint: true
+                registerSecurityScan(
+                    // Security Scan to include
+                    artifacts: "output/blackduck-sarif-report.sarif",
+                    format: "sarif",
+                    archive: true
+                )
             }
         }
+
+        // stage('Archive SARIF Report') {
+        //     steps {
+        //         archiveArtifacts artifacts: 'output/*.sarif', fingerprint: true
+        //     }
+        // }
     }
 }
